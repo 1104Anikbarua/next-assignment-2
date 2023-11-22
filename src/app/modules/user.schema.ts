@@ -1,6 +1,7 @@
 import { Schema } from 'mongoose';
 import IUser, { TAddress, TFullName, TOrder } from './user.interface';
-
+import bcrypt from 'bcrypt';
+import config from '../config';
 const fullNameSchema = new Schema<TFullName>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -19,8 +20,8 @@ const orderSchema = new Schema<TOrder>({
 });
 
 const userSchema = new Schema<IUser>({
-  userId: { type: Number, required: true, unique: true },
-  userName: { type: String, required: true, unique: true },
+  userId: { unique: true, type: Number, required: true },
+  username: { type: String, required: true },
   password: { type: String, required: true },
   fullName: {
     type: fullNameSchema,
@@ -28,12 +29,25 @@ const userSchema = new Schema<IUser>({
   },
   age: { type: Number, required: true },
   isActive: { type: Boolean, required: true },
-  hobbies: [String],
+  hobbies: [{ type: String, required: true }],
   address: {
     type: addressSchema,
     required: true,
   },
 
-  orders: [{ orderSchema, required: true }],
+  orders: [{ orderSchema }],
 });
+
+userSchema.pre('save', async function (next) {
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.password_hash),
+  );
+  next();
+});
+userSchema.post('save', async function (doc, next) {
+  doc.password = '';
+  next();
+});
+
 export default userSchema;

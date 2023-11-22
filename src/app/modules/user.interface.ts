@@ -15,7 +15,7 @@ export type TOrder = {
 
 export interface IUser {
   userId: number;
-  userName: string;
+  username: string;
   password: string;
   fullName: TFullName;
   age: number;
