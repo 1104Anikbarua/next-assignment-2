@@ -1,3 +1,7 @@
+export type TFullName = {
+  firstName: string;
+  lastName: string;
+};
 export type TAddress = {
   street: string;
   city: string;
@@ -13,10 +17,7 @@ export interface IUser {
   userId: number;
   userName: string;
   password: string;
-  fullName: {
-    firstName: string;
-    lastName: string;
-  };
+  fullName: TFullName;
   age: number;
   email: number;
   isActive: boolean;
