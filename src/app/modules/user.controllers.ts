@@ -8,7 +8,7 @@ const setUser = async (req: Request, res: Response) => {
     const result = await userServices.setUser(user);
     res.status(200).json({
       success: true,
-      message: 'User created sucessfully',
+      message: 'User created successfully',
       data: result,
     });
   } catch (error: any) {
@@ -26,7 +26,7 @@ const getAllUser = async (req: Request, res: Response) => {
     const result = await userServices.getAllUser();
     res.status(200).json({
       success: true,
-      message: 'User fetched sucessfully!',
+      message: 'User fetched successfully!',
       data: result,
     });
   } catch (error) {
@@ -44,7 +44,7 @@ const getUser = async (req: Request, res: Response) => {
     const result = await userServices.getUser(userId);
     res.status(200).json({
       success: true,
-      message: 'User fetched sucessfully!',
+      message: 'User fetched successfully!',
       data: result,
     });
   } catch (error: any) {
@@ -62,11 +62,29 @@ const setSingleUser = async (req: Request, res: Response) => {
     const result = await userServices.setSingleUser(userId, user);
     res.status(200).json({
       success: true,
-      message: 'User fetched successfully!',
+      message: 'User updated successfully!',
       data: result,
     });
   } catch (error: any) {
     res.status(404).json({
+      success: false,
+      message: 'User not found',
+      error: { code: 404, description: error.message },
+    });
+  }
+};
+// remove user from database
+const removeUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await userServices.removeUser(userId);
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully!',
+      data: null,
+    });
+  } catch (error: any) {
+    res.status(400).json({
       success: false,
       message: 'User not found',
       error: { code: 404, description: error.message },
@@ -79,4 +97,5 @@ export const userControllers = {
   getAllUser,
   getUser,
   setSingleUser,
+  removeUser,
 };
