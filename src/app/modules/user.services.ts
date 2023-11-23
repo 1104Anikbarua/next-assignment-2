@@ -83,6 +83,34 @@ const getUserOrders = async (userId: string) => {
   const result = await UserModel.findOne({ userId }, { _id: 0, orders: 1 });
   return result;
 };
+const getTotalPrice = async (userId: string) => {
+  const existingUser = await UserModel.isUserExists(userId);
+  if (!existingUser) {
+    throw new Error('User not found!');
+  }
+  const id = await JSON.parse(userId);
+  const result = await UserModel.aggregate([
+    // stage-1
+    { $match: { userId: id } },
+    // stage-2
+    { $unwind: '$orders' },
+    // stage-3
+    {
+      $group: {
+        _id: '$null',
+        total: { $sum: { $multiply: ['$orders.price', '$orders.quantity'] } },
+      },
+    },
+    // stage-4
+    {
+      $project: {
+        totalPrice: { $round: ['$total', 2] },
+        _id: 0,
+      },
+    },
+  ]);
+  return result.length > 0 ? result[0].totalPrice : 0;
+};
 
 export const userServices = {
   setUser,
@@ -92,4 +120,5 @@ export const userServices = {
   removeUser,
   addOrder,
   getUserOrders,
+  getTotalPrice,
 };
