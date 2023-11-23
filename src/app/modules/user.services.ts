@@ -1,5 +1,7 @@
+import config from '../config';
 import { IUser } from './user.interface';
 import UserModel from './user.model';
+import bcrypt from 'bcrypt';
 
 const setUser = async (user: IUser) => {
   const result = await UserModel.create(user);
@@ -22,9 +24,27 @@ const getUser = async (userId: string) => {
   const result = await UserModel.findOne({ userId }, { password: 0 });
   return result;
 };
+// update single user
+const setSingleUser = async (userId: string, user: IUser) => {
+  const existingUser = await UserModel.isUserExists(userId);
+  if (!existingUser) {
+    throw new Error('User not found!');
+  }
 
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.password_hash),
+  );
+  const result = await UserModel.findOneAndUpdate(
+    { userId },
+    { $set: user },
+    { new: true, runValidators: true },
+  ).select('userId username fullName age email isActive hobbies address');
+  return result;
+};
 export const userServices = {
   setUser,
   getAllUser,
   getUser,
+  setSingleUser,
 };

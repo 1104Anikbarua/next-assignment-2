@@ -51,9 +51,7 @@ const userSchema = new Schema<IUser, IUserMethod>({
 
 // static method
 userSchema.statics.isUserExists = async function (userId: string) {
-  console.log('who called after first =>schema');
   const existingUser = await UserModel.findOne({ userId });
-  console.log(existingUser);
   return existingUser !== null;
 };
 
@@ -65,6 +63,13 @@ userSchema.pre('save', async function (next) {
   );
   next();
 });
+
+// userSchema.pre('updateOne', function (next) {
+//   const update = this.getUpdate();
+//   console.log(update.$set.password);
+//   // next();
+// });
+
 userSchema.post('save', async function (doc, next) {
   doc.password = '';
   next();
