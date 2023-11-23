@@ -57,11 +57,10 @@ const removeUser = async (userId: string) => {
     throw new Error('User not found!');
   }
   const result = await UserModel.deleteOne({ userId });
-  console.log(result);
   return result;
 };
 
-// order
+//user add order
 const addOrder = async (userId: string, orders: TOrder) => {
   // console.log('hit at order route ', userId, order);
   const existingUser = await UserModel.isUserExists(userId);
@@ -75,6 +74,15 @@ const addOrder = async (userId: string, orders: TOrder) => {
   );
   return result;
 };
+// get user order
+const getUserOrders = async (userId: string) => {
+  const existingUser = await UserModel.isUserExists(userId);
+  if (!existingUser) {
+    throw new Error('User not found!');
+  }
+  const result = await UserModel.findOne({ userId }, { _id: 0, orders: 1 });
+  return result;
+};
 
 export const userServices = {
   setUser,
@@ -83,4 +91,5 @@ export const userServices = {
   setSingleUser,
   removeUser,
   addOrder,
+  getUserOrders,
 };
