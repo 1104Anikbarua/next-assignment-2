@@ -1,5 +1,5 @@
 import config from '../config';
-import { IUser } from './user.interface';
+import { IUser, TOrder } from './user.interface';
 import UserModel from './user.model';
 import bcrypt from 'bcrypt';
 
@@ -11,7 +11,14 @@ const setUser = async (user: IUser): Promise<IUser | null> => {
 const getAllUser = async () => {
   const result = await UserModel.find(
     {},
-    { username: 1, fullName: 1, age: 1, email: 1, address: 1, _id: 0 },
+    {
+      username: 1,
+      fullName: 1,
+      age: 1,
+      email: 1,
+      address: 1,
+      _id: 0,
+    },
   );
   return result;
 };
@@ -54,10 +61,26 @@ const removeUser = async (userId: string) => {
   return result;
 };
 
+// order
+const addOrder = async (userId: string, orders: TOrder) => {
+  // console.log('hit at order route ', userId, order);
+  const existingUser = await UserModel.isUserExists(userId);
+  if (!existingUser) {
+    throw new Error('User not found!');
+  }
+  const result = await UserModel.updateOne(
+    { userId },
+    { $push: { orders: orders } },
+    { upsert: true },
+  );
+  return result;
+};
+
 export const userServices = {
   setUser,
   getAllUser,
   getUser,
   setSingleUser,
   removeUser,
+  addOrder,
 };

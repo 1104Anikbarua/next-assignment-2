@@ -28,8 +28,8 @@ const orderSchema = new Schema<TOrder>({
 });
 
 const userSchema = new Schema<IUser, IUserMethod>({
-  userId: { type: Number, required: true },
-  username: { type: String, required: true },
+  userId: { type: Number, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   fullName: {
     type: fullNameSchema,
@@ -43,11 +43,12 @@ const userSchema = new Schema<IUser, IUserMethod>({
     required: true,
   },
 
-  orders: [{ orderSchema }],
+  orders: { type: [orderSchema], default: [] },
 });
 
 // create index
-// userSchema.index({ userId: 1, username: 1 }, { unique: true });
+// userSchema.index({ userId: 1 }, { unique: true });
+// userSchema.index({ username: 1 }, { unique: true });
 
 // static method
 userSchema.statics.isUserExists = async function (userId: string) {
@@ -64,14 +65,9 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// userSchema.pre('updateOne', function (next) {
-//   const update = this.getUpdate();
-//   console.log(update.$set.password);
-//   // next();
-// });
-
 userSchema.post('save', async function (doc, next) {
   doc.password = '';
+  // doc.orders = undefined;
   next();
 });
 

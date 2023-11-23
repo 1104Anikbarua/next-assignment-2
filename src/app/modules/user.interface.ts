@@ -25,9 +25,10 @@ export interface IUser {
   isActive: boolean;
   hobbies: Array<string>;
   address: TAddress;
-  orders: Array<TOrder>;
+  orders?: Array<TOrder>;
 }
 
 export interface IUserMethod extends Model<IUser> {
+  // eslint-disable-next-line no-unused-vars
   isUserExists(userId: string): Promise<IUser | null>;
 }
