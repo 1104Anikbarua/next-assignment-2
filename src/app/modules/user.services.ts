@@ -43,14 +43,18 @@ const setSingleUser = async (userId: string, user: IUser) => {
     throw new Error('User not found!');
   }
 
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.password_hash),
-  );
+  // user.password = await bcrypt.hash(
+  //   user.password,
+  //   Number(config.password_hash),
+  // );
   const result = await UserModel.findOneAndUpdate(
     { userId },
-    { $set: user },
-    { new: true, runValidators: true },
+    // { $set: user },
+    user,
+    {
+      new: true,
+      //  runValidators: true
+    },
   ).select('userId username fullName age email isActive hobbies address');
   return result;
 };

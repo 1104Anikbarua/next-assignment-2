@@ -78,9 +78,12 @@ userSchema.set('toJSON', {
 });
 
 // userSchema.post('save', async function (doc, next) {
-// console.log(doc);
-// doc.password = undefined;
-// doc.orders = undefined;
+//   console.log(doc);
+//   const user = doc;
+//   user.toObject();
+//   delete user.password;
+//   doc.password = undefined;
+//   doc.orders = undefined;
 //   next();
 // });
 
