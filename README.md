@@ -1,5 +1,3 @@
-Include a README file with clear instructions on how to run the application locally.
-
 # To run this server locally
 
 - first clone the repository
