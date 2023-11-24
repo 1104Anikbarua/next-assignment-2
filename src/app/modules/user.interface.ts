@@ -21,7 +21,7 @@ export interface IUser {
   password: string;
   fullName: TFullName;
   age: number;
-  email: number;
+  email: string;
   isActive: boolean;
   hobbies: Array<string>;
   address: TAddress;
