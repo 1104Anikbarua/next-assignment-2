@@ -49,10 +49,6 @@ const userSchema = new Schema<IUser, IUserMethod>({
   orders: { type: [orderSchema], default: [], _id: false },
 });
 
-// create index
-// userSchema.index({ userId: 1 }, { unique: true });
-// userSchema.index({ username: 1 }, { unique: true });
-
 // static method
 userSchema.statics.isUserExists = async function (userId: string) {
   const existingUser = await UserModel.findOne({ userId });
@@ -71,20 +67,15 @@ userSchema.set('toJSON', {
   transform: function (doc, ret) {
     delete ret._id;
     delete ret.password;
-    // delete ret.orders;
     delete ret.__v;
-    // return ret;
+    return ret;
   },
 });
 
-// userSchema.post('save', async function (doc, next) {
-//   console.log(doc);
-//   const user = doc;
-//   user.toObject();
-//   delete user.password;
-//   doc.password = undefined;
-//   doc.orders = undefined;
-//   next();
-// });
+userSchema.post('save', async function (doc, next) {
+  const user = doc;
+  user.orders = undefined;
+  next();
+});
 
 export default userSchema;
