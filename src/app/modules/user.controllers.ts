@@ -14,21 +14,21 @@ const setUser = async (req: Request, res: Response) => {
       message: 'User created successfully',
       data: result,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      res.status(400).json({
+      res.status(404).json({
         success: false,
-        message: 'User creation Failed',
+        message: 'User creation failed',
         error: {
           code: error.issues[0].code,
           description: error.issues[0].message,
         },
       });
-    } else {
-      res.status(400).json({
+    } else if (error instanceof Error) {
+      res.status(404).json({
         success: false,
-        message: 'User creation Failed',
-        error: { code: error.code, description: error.message },
+        message: 'User creation failed',
+        error: { code: error.name, description: error.message },
       });
     }
   }
@@ -42,12 +42,14 @@ const getAllUser = async (req: Request, res: Response) => {
       message: 'User fetched successfully!',
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Failed to fetched Users',
-      data: error,
-    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(404).json({
+        success: false,
+        message: 'Failed to fetched Users',
+        data: error,
+      });
+    }
   }
 };
 // get single user by user id
@@ -60,12 +62,14 @@ const getUser = async (req: Request, res: Response) => {
       message: 'User fetched successfully!',
       data: result,
     });
-  } catch (error: any) {
-    res.status(404).json({
-      success: false,
-      message: 'User not found',
-      error: { code: 404, description: error.message },
-    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: { code: 404, description: error.message },
+      });
+    }
   }
 };
 // update a single user information
@@ -81,7 +85,7 @@ const setSingleUser = async (req: Request, res: Response) => {
       message: 'User updated successfully!',
       data: result,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       res.status(404).json({
         success: false,
@@ -91,7 +95,7 @@ const setSingleUser = async (req: Request, res: Response) => {
           description: error.issues[0].message,
         },
       });
-    } else {
+    } else if (error instanceof Error) {
       res.status(404).json({
         success: false,
         message: 'User not found',
@@ -107,45 +111,45 @@ const setSingleUser = async (req: Request, res: Response) => {
 const removeUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    // const result =
     await userServices.removeUser(userId);
     res.status(200).json({
       success: true,
       message: 'User deleted successfully!',
       data: null,
     });
-  } catch (error: any) {
-    res.status(404).json({
-      success: false,
-      message: 'User not found',
-      error: { code: 404, description: error.message },
-    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: { code: 404, description: error.message },
+      });
+    }
   }
 };
-
 // set user order
 const addOrder = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const order = req.body;
     const outcome = orderSchema.parse(order);
-    // const result =
     await userServices.addOrder(userId, outcome);
     res.status(200).json({
       success: true,
       message: 'Order created successfully!',
       data: null,
     });
-  } catch (error: any) {
-    res.status(404).json({
-      success: false,
-      message: 'User not found',
-      error: { code: 404, description: error.message },
-    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: { code: 404, description: error.message },
+      });
+    }
   }
 };
-
-// orders
+//get user orders
 const getUserOrders = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -155,15 +159,16 @@ const getUserOrders = async (req: Request, res: Response) => {
       message: 'Order fetched successfully',
       data: result,
     });
-  } catch (error: any) {
-    res.status(404).json({
-      success: false,
-      message: 'User not found',
-      error: { code: 404, description: error.message },
-    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: { code: 404, description: error.message },
+      });
+    }
   }
 };
-
 // calculate total price
 const getTotalPrice = async (req: Request, res: Response) => {
   try {
@@ -174,12 +179,14 @@ const getTotalPrice = async (req: Request, res: Response) => {
       message: 'Total price calculated successfully',
       data: { result },
     });
-  } catch (error: any) {
-    res.status(404).json({
-      success: false,
-      message: 'User not found',
-      error: { code: 404, description: error.message },
-    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: { code: 404, description: error.message },
+      });
+    }
   }
 };
 
