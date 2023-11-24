@@ -5,7 +5,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use('/api/users', userRoutes);
+app.use('/', userRoutes);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('hello world');

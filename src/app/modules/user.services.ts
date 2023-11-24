@@ -3,11 +3,12 @@ import { IUser, TOrder } from './user.interface';
 import UserModel from './user.model';
 import bcrypt from 'bcrypt';
 
+// add user in database
 const setUser = async (user: IUser): Promise<IUser | null> => {
   const result = await UserModel.create(user);
   return result;
 };
-
+// get all user from database
 const getAllUser = async () => {
   const result = await UserModel.find(
     {},
@@ -22,13 +23,17 @@ const getAllUser = async () => {
   );
   return result;
 };
-
+// get single user from database
 const getUser = async (userId: string): Promise<IUser | null> => {
   const existsingUser = await UserModel.isUserExists(userId);
   if (!existsingUser) {
-    throw new Error('User already exists');
+    throw new Error('User not found!');
   }
-  const result = await UserModel.findOne({ userId }, { password: 0 });
+  const result = await UserModel.findOne(
+    { userId },
+    // todo order
+    { password: 0, orders: 0 },
+  );
   return result;
 };
 // update single user
@@ -62,7 +67,6 @@ const removeUser = async (userId: string) => {
 
 //user add order
 const addOrder = async (userId: string, orders: TOrder) => {
-  // console.log('hit at order route ', userId, order);
   const existingUser = await UserModel.isUserExists(userId);
   if (!existingUser) {
     throw new Error('User not found!');

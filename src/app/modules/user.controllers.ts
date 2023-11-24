@@ -1,27 +1,38 @@
 import { Request, Response } from 'express';
 import { userServices } from './user.services';
-import { zodSchema } from './user.validation';
+import { orderSchema, zodSchema } from './user.validation';
+import { z } from 'zod';
 
 // add a new user to the database
 const setUser = async (req: Request, res: Response) => {
   try {
     const { user } = req.body;
-    const valid = zodSchema.parse(user);
-    const result = await userServices.setUser(valid);
+    const outcome = zodSchema.parse(user);
+    const result = await userServices.setUser(outcome);
     res.status(200).json({
       success: true,
       message: 'User created successfully',
       data: result,
     });
   } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: 'User creation Failed',
-      error: { code: error.code, description: error.message },
-    });
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        success: false,
+        message: 'User creation Failed',
+        error: {
+          code: error.issues[0].code,
+          description: error.issues[0].message,
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'User creation Failed',
+        error: { code: error.code, description: error.message },
+      });
+    }
   }
 };
-
 // get all the user from database
 const getAllUser = async (req: Request, res: Response) => {
   try {
@@ -50,24 +61,6 @@ const getUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-    res
-      .status(400)
-      .json({ success: false, message: 'User not found', data: error });
-  }
-};
-
-// update a single user information
-const setSingleUser = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params;
-    const user = req.body;
-    const result = await userServices.setSingleUser(userId, user);
-    res.status(200).json({
-      success: true,
-      message: 'User updated successfully!',
-      data: result,
-    });
-  } catch (error: any) {
     res.status(404).json({
       success: false,
       message: 'User not found',
@@ -75,11 +68,47 @@ const setSingleUser = async (req: Request, res: Response) => {
     });
   }
 };
+// update a single user information
+const setSingleUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const user = req.body;
+    const outcome = zodSchema.parse(user);
+    const result = await userServices.setSingleUser(userId, outcome);
+
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully!',
+      data: result,
+    });
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: error.issues[0].code,
+          description: error.issues[0].message,
+        },
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: error.message,
+        },
+      });
+    }
+  }
+};
 // remove user from database
 const removeUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const result = await userServices.removeUser(userId);
+    // const result =
+    await userServices.removeUser(userId);
     res.status(200).json({
       success: true,
       message: 'User deleted successfully!',
@@ -95,12 +124,13 @@ const removeUser = async (req: Request, res: Response) => {
 };
 
 // set user order
-
 const addOrder = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const order = req.body;
-    const result = await userServices.addOrder(userId, order);
+    const outcome = orderSchema.parse(order);
+    // const result =
+    await userServices.addOrder(userId, outcome);
     res.status(200).json({
       success: true,
       message: 'Order created successfully!',
@@ -134,6 +164,7 @@ const getUserOrders = async (req: Request, res: Response) => {
   }
 };
 
+// calculate total price
 const getTotalPrice = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;

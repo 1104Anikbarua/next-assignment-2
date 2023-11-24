@@ -1,5 +1,28 @@
 import { z } from 'zod';
 
+export const orderSchema = z.object({
+  productName: z
+    .string({
+      required_error: 'Product name is required',
+      invalid_type_error: 'Product name must be a string',
+    })
+    .min(1, { message: 'Product name is too short' })
+    .max(30, { message: 'Product name is too long' })
+    .trim(),
+  price: z
+    .number({
+      required_error: 'Price is required',
+      invalid_type_error: 'Price must be a number',
+    })
+    .positive({ message: 'Price must be a positive number' }),
+  quantity: z
+    .number({
+      required_error: 'Quantity is required',
+      invalid_type_error: 'Quantity must be a number',
+    })
+    .positive({ message: 'Quantity must be a positive number' })
+    .min(1, { message: 'Quantity must be define' }),
+});
 export const zodSchema = z.object({
   userId: z
     .number({
@@ -63,8 +86,8 @@ export const zodSchema = z.object({
       required_error: 'Email is required',
       invalid_type_error: 'Email must be string',
     })
-    .email(),
-  // .trim()
+    .email()
+    .trim(),
   isActive: z.boolean({
     required_error: 'isActive is required',
     invalid_type_error: 'isActive must be a true or false',
@@ -100,31 +123,5 @@ export const zodSchema = z.object({
         .trim(),
     })
     .required(),
-  orders: z
-    .array(
-      z.object({
-        productName: z
-          .string({
-            required_error: 'Product name is required',
-            invalid_type_error: 'Product name must be a string',
-          })
-          .max(1, { message: 'Product name is too short' })
-          .max(30, { message: 'Product name is too long' })
-          .trim(),
-        price: z
-          .number({
-            required_error: 'Price is required',
-            invalid_type_error: 'Price must be a number',
-          })
-          .positive({ message: 'Price must be a positive number' }),
-        quantity: z
-          .number({
-            required_error: 'Quantity is required',
-            invalid_type_error: 'Quantity must be a number',
-          })
-          .positive({ message: 'Quantity must be a positive number' })
-          .min(1, { message: 'Quantity must be define' }),
-      }),
-    )
-    .default([]),
+  orders: z.array(orderSchema).default([]),
 });

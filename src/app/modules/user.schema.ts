@@ -34,6 +34,7 @@ const userSchema = new Schema<IUser, IUserMethod>({
   fullName: {
     type: fullNameSchema,
     required: true,
+    _id: false,
   },
   age: { type: Number, required: true },
   email: { type: String, required: true },
@@ -42,9 +43,10 @@ const userSchema = new Schema<IUser, IUserMethod>({
   address: {
     type: addressSchema,
     required: true,
+    _id: false,
   },
 
-  orders: { type: [orderSchema], default: [] },
+  orders: { type: [orderSchema], default: [], _id: false },
 });
 
 // create index
@@ -65,11 +67,21 @@ userSchema.pre('save', async function (next) {
   );
   next();
 });
-
-userSchema.post('save', async function (doc, next) {
-  doc.password = '';
-  doc.orders = undefined;
-  next();
+userSchema.set('toJSON', {
+  transform: function (doc, ret) {
+    delete ret._id;
+    delete ret.password;
+    // delete ret.orders;
+    delete ret.__v;
+    // return ret;
+  },
 });
+
+// userSchema.post('save', async function (doc, next) {
+// console.log(doc);
+// doc.password = undefined;
+// doc.orders = undefined;
+//   next();
+// });
 
 export default userSchema;
