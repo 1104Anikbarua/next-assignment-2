@@ -1,7 +1,5 @@
-import config from '../config';
 import { IUser, TOrder } from './user.interface';
 import UserModel from './user.model';
-import bcrypt from 'bcrypt';
 
 // add user in database
 const setUser = async (user: IUser): Promise<IUser | null> => {
@@ -42,10 +40,6 @@ const setSingleUser = async (userId: string, user: IUser) => {
   if (!existingUser) {
     throw new Error('User not found!');
   }
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.password_hash),
-  );
   const result = await UserModel.findOneAndUpdate({ userId }, user, {
     new: true,
   }).select('userId username fullName age email isActive hobbies address');
@@ -84,6 +78,7 @@ const getUserOrders = async (userId: string) => {
   const result = await UserModel.findOne({ userId }, { _id: 0, orders: 1 });
   return result;
 };
+// calculate user total order price
 const getTotalPrice = async (userId: string) => {
   const existingUser = await UserModel.isUserExists(userId);
   if (!existingUser) {

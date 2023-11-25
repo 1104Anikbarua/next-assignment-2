@@ -59,15 +59,21 @@ export const zodSchema = z.object({
         })
         .min(1, { message: 'First name is too short' })
         .max(20, { message: 'First name is too long' })
-        .trim(),
+        .trim()
+        .refine((value) => /^[A-Za-z]+$/.test(value), {
+          message: 'First name should contain only alphabets',
+        }),
       lastName: z
         .string({
           required_error: 'First name is required',
           invalid_type_error: 'First name must be string',
         })
-        .min(1, { message: 'First name is too short' })
-        .max(20, { message: 'First name is too long' })
-        .trim(),
+        .min(1, { message: 'Last name is too short' })
+        .max(20, { message: 'Last name is too long' })
+        .trim()
+        .refine((value) => /^[A-Za-z]+$/.test(value), {
+          message: 'Last name should contain only alphabets',
+        }),
     })
     .required(),
 

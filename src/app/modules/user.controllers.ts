@@ -77,7 +77,6 @@ const setSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const user = req.body;
-    // const outcome = zodSchema.parse(user);
     const result = await userServices.setSingleUser(userId, user);
 
     res.status(200).json({

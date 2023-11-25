@@ -63,6 +63,7 @@ userSchema.pre('save', async function (next) {
   );
   next();
 });
+// delete some field from converted json before send response
 userSchema.set('toJSON', {
   transform: function (doc, ret) {
     delete ret._id;
@@ -72,9 +73,21 @@ userSchema.set('toJSON', {
   },
 });
 
+// remove order field
 userSchema.post('save', async function (doc, next) {
   const user = doc;
   user.orders = undefined;
+  next();
+});
+// middleware encrypt password
+userSchema.pre('findOneAndUpdate', async function (next) {
+  const user = this.getUpdate() as { [key: string]: string };
+  if (user.password) {
+    user.password = await bcrypt.hash(
+      user.password,
+      Number(config.password_hash),
+    );
+  }
   next();
 });
 
