@@ -6,7 +6,7 @@ import { z } from 'zod';
 // add a new user to the database
 const setUser = async (req: Request, res: Response) => {
   try {
-    const { user } = req.body;
+    const user = req.body;
     const outcome = zodSchema.parse(user);
     const result = await userServices.setUser(outcome);
     res.status(200).json({
@@ -39,7 +39,7 @@ const getAllUser = async (req: Request, res: Response) => {
     const result = await userServices.getAllUser();
     res.status(200).json({
       success: true,
-      message: 'User fetched successfully!',
+      message: 'Users fetched successfully!',
       data: result,
     });
   } catch (error: unknown) {
@@ -155,7 +155,7 @@ const getUserOrders = async (req: Request, res: Response) => {
     const result = await userServices.getUserOrders(userId);
     res.status(200).json({
       success: true,
-      message: 'Order fetched successfully',
+      message: 'Order fetched successfully!',
       data: result,
     });
   } catch (error: unknown) {
@@ -175,7 +175,7 @@ const getTotalPrice = async (req: Request, res: Response) => {
     const result = await userServices.getTotalPrice(userId);
     res.status(200).json({
       success: true,
-      message: 'Total price calculated successfully',
+      message: 'Total price calculated successfully!',
       data: { result },
     });
   } catch (error: unknown) {
